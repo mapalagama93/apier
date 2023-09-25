@@ -9,13 +9,15 @@ class Runner:
 
     def run(self):
         files = self.getFiles()
+        if len(files) == 0:
+            cprint('No action provided. eg: apier -e=dev action1 action2', 'white', 'on_yellow', attrs=['bold'])
         for x in files:
-            cprint('   START ACTION [' + x['name'] + ']   ', 'white', 'on_yellow')
+            cprint('   START ACTION [' + x['name'] + ']   ', 'white', 'on_yellow', attrs=['bold'])
             print('\n')
             executer = RequestExecuter(self.getFileContent(x['file']))
             executer.execute()
-            cprint('   END ACTION [' + x['name']+']   ', 'white', 'on_yellow')
-            print('\n\n\n')
+            cprint('   END ACTION [' + x['name']+']   ', 'white', 'on_yellow', attrs=['bold'])
+            print('\n')
         
     
     def getFiles(self):

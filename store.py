@@ -12,12 +12,13 @@ Path(config_file_path).touch(exist_ok=True)
 config_file = open(config_file_path, 'rb')
 configs.load(config_file, 'utf-8')
 
-env_file_path = args.root + '/' + args.env + '.properties'
-if(os.path.exists(env_file_path) == False):
-    cprint(args.env + '.properties file does not exists.', attrs=['reverse'])
-else:
-    env_file = open(env_file_path, 'rb')
-    configs.load(env_file, 'utf-8')
+if args.env != None:
+    env_file_path = args.root + '/' + args.env + '.properties'
+    if(os.path.exists(env_file_path) == False):
+        cprint(args.env + '.properties file does not exists.', attrs=['reverse'])
+    else:
+        env_file = open(env_file_path, 'rb')
+        configs.load(env_file, 'utf-8')
 
 vars_file_path = args.root + '/vars.properties'
 Path(vars_file_path).touch(exist_ok=True)
