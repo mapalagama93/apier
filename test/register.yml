@@ -1,0 +1,13 @@
+name: Register
+request:
+  method: post
+  url: "{{config::server}}/api/register"
+  body: |
+    {
+      "email" : "email@email.com",
+      "password" : "password"
+    }
+assign:
+  fromBody:
+    user_id: "$.id"
+    token : "$.token"
