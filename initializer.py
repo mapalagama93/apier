@@ -33,6 +33,10 @@ def update_config():
 
 
 def check_if_init():
+    if '-h' in sys.argv[1:]:
+        cprint('To run : apier -e=dev get-user.yaml')
+        cprint('To generate : apier -i -e=dev,lzdev')
+        exit();
     if not '-i' in sys.argv[1:]:
         return
     for x in sys.argv[1:]:
