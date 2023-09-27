@@ -39,14 +39,14 @@ class RequestExecuter:
             print('\n')
         
     def log_request(self):
-        cprint(' REQUEST ', 'white', 'on_blue')
+        cprint(' REQUEST ', 'black', 'on_blue')
         print(colored(self.method().upper(), 'blue', attrs=['bold']), colored(self.url(), attrs=['bold']))
         print(colored('Request Headers ', 'magenta', attrs=['bold']),  '\n',  json.dumps(self.headers(), indent=2), sep="")
         print(colored('Request Body ', 'magenta', attrs=['bold']), colored('[JSON]' if self.isJsonRequest() else '', 'light_grey', attrs=['bold']), '\n', json.dumps(json.loads(self.data()), indent=2) if self.isJsonRequest() and self.data() != None else self.data(), sep="")
         print('\n')
     
     def log_response(self):
-        cprint(' RESPONSE ', 'white', 'on_green')
+        cprint(' RESPONSE ', 'black', 'on_green')
         print(colored('Status', 'magenta', attrs=['bold']), self.response['status'])
         print(colored('Response Headers ', 'magenta', attrs=['bold']), '\n' , json.dumps(self.response['headers'], indent=2))
         print(colored('Response Body ', 'magenta', attrs=['bold']), '\n', json.dumps(self.response['data'], indent=2) if self.isJsonResponse() and self.response['json'] else self.response['data'], sep="")
