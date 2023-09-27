@@ -14,10 +14,21 @@ class Runner:
         for x in files:
             cprint('   START ACTION [' + x['name'] + ']   ', 'white', 'on_yellow', attrs=['bold'])
             print('\n')
-            executer = RequestExecuter(self.getFileContent(x['file']))
+            template = self.getFileContent(x['file'])
+            if('preScript' in template) :
+                self.runPreScript(template['preScript'], template)
+            executer = RequestExecuter(template)
             executer.execute()
+            if('postScript' in template) :
+                self.runPostScript(template['postScript'],template, executer.response)
             cprint('   END ACTION [' + x['name']+']   ', 'white', 'on_yellow', attrs=['bold'])
             print('\n')
+    
+    def runPreScript(self, script, this):
+        exec(script)
+
+    def runPostScript(self, script, this, response):
+        exec(script)
         
     
     def getFiles(self):

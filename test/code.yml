@@ -1,0 +1,16 @@
+name: Get user
+preScript: |
+  import hmac
+  print("hello world", this['request']['url'])
+postScript: |
+  import hmac
+  print("hello post", str(response['status']))
+request:
+  method: get
+  url: "{{config::server}}/api/users/2"
+assign:
+  fromBody:
+    user_id: "$.data.id"
+    user_email : "$.data.email"
+  fromHeaders:
+    date: "date"
