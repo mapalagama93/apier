@@ -26,36 +26,36 @@ var_file = open(vars_file_path, 'rb')
 vars.load(var_file, 'utf-8')
 
 
-def getConfig(key, val=None):
+def get_config(key, val=None):
     try:
         return configs[key].data
     except:
         return val
 
-def getVar(key, val=None):
+def get_var(key, val=None):
     try:
         return vars[key].data
     except:
         return val
 
-def setVar(key, val):
+def set(key, val):
     vars[key] = val
     with open(vars_file_path, 'wb') as f:
         vars.store(f, encoding='utf-8')
 
 def get(key, val=''):
-    return getConfig(key, getVar(key, ''))
+    return get_config(key, get_var(key, ''))
+
+def get_all():
+    all = Properties()
+    all.update(configs)
+    all.update(vars)
+    return all
+
 
 def populate(str):
-    for x in vars:
-        str = str.replace('{{v::' + x + '}}', getVar(x, ''))
-        str = str.replace('{{var::' + x + '}}', getVar(x, ''))
-        str = str.replace('{{vars::' + x + '}}', getVar(x, ''))
-    for x in configs:
-        str = str.replace('{{v::' + x + '}}', getConfig(x, ''))
-        str = str.replace('{{var::' + x + '}}', getConfig(x, ''))
-        str = str.replace('{{vars::' + x + '}}', getConfig(x, ''))
-        str = str.replace('{{c::' + x + '}}', getConfig(x, ''))
-        str = str.replace('{{config::' + x + '}}', getConfig(x, ''))
-        str = str.replace('{{configs::' + x + '}}', getConfig(x, ''))
+    for x in get_all():
+        str = str.replace('{{v::' + x + '}}', get_config(x, ''))
+        str = str.replace('{{var::' + x + '}}', get_config(x, ''))
+        str = str.replace('{{vars::' + x + '}}', get_config(x, ''))
     return str

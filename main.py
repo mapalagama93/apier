@@ -1,4 +1,4 @@
-import store
+import vars
 from runner import Runner
 
 run = Runner()

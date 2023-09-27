@@ -1,13 +1,19 @@
 name: Get user
-preScript: |
-  import hmac
-  print("hello world", this['request']['url'])
-postScript: |
-  import hmac
-  print("hello post", str(response['status']))
+
+preAction: 
+  script: |
+    import functions
+    print("hello world", context.this['request']['url'])
+    functions.do()
+
+postAction: 
+  script:
+    file: scripts/post.py
+
+
 request:
   method: get
-  url: "{{config::server}}/api/users/2"
+  url: "{{v::server}}/api/users/2"
 assign:
   fromBody:
     user_id: "$.data.id"

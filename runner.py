@@ -3,9 +3,11 @@ import os
 import args
 import yaml
 from termcolor import cprint
-import store
-import functions
+import vars
+import script_evaluator
 
+
+    
 class Runner:
 
     def run(self):
@@ -13,25 +15,30 @@ class Runner:
         if len(files) == 0:
             cprint('No action provided. eg: apier -e=dev action1 action2', 'white', 'on_yellow', attrs=['bold'])
         for x in files:
-            cprint('   START ACTION [' + x['name'] + ']   ', 'white', 'on_yellow', attrs=['bold'])
+
+            cprint('   START ACTION [' + x['name'] + ']   ', 'black', 'on_yellow', attrs=['bold'])
             print('\n')
+
+
             template = self.getFileContent(x['file'])
-            if('preScript' in template) :
-                self.runPreScript(template['preScript'], template)
+            if('preAction' in template):
+                context = EvalContext()
+                context.this = template
+                self.executeSection(template['preAction'], context)
+            
+            template = self.getFileContent(x['file'])
             executer = RequestExecuter(template)
             executer.execute()
-            if('postScript' in template) :
-                self.runPostScript(template['postScript'],template, executer.response)
-            cprint('   END ACTION [' + x['name']+']   ', 'white', 'on_yellow', attrs=['bold'])
-            print('\n')
-    
-    def runPreScript(self, script, this):
-        fn = functions.Custom()
-        exec(script)
 
-    def runPostScript(self, script, this, response):
-        fn = functions.Custom()
-        exec(script)
+            if('postAction' in template):
+                context = EvalContext()
+                context.this = template
+                context.response = executer.response
+                self.executeSection(template['postAction'], context)
+            
+
+            cprint('   END ACTION [' + x['name']+']   ', 'black', 'on_yellow', attrs=['bold'])
+            print('\n')
         
     
     def getFiles(self):
@@ -49,4 +56,12 @@ class Runner:
     
     def getFileContent(self, fpath):
         with open(fpath, 'r') as file:
-            return yaml.safe_load(store.populate(file.read()))
+            return yaml.safe_load(vars.populate(file.read()))
+    
+    def executeSection(self, section, context):
+        if 'script' in section:
+            script_evaluator.eval(section['script'], context)
+
+
+class EvalContext:
+    pass
