@@ -43,6 +43,9 @@ def setVar(key, val):
     with open(vars_file_path, 'wb') as f:
         vars.store(f, encoding='utf-8')
 
+def get(key, val=''):
+    return getConfig(key, getVar(key, ''))
+
 def populate(str):
     for x in vars:
         str = str.replace('{{v::' + x + '}}', getVar(x, ''))

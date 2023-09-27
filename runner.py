@@ -4,6 +4,7 @@ import args
 import yaml
 from termcolor import cprint
 import store
+import functions
 
 class Runner:
 
@@ -25,9 +26,11 @@ class Runner:
             print('\n')
     
     def runPreScript(self, script, this):
+        fn = functions.Custom()
         exec(script)
 
     def runPostScript(self, script, this, response):
+        fn = functions.Custom()
         exec(script)
         
     
