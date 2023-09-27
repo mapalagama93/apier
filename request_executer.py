@@ -1,6 +1,7 @@
 from requests import request
 from termcolor import cprint, colored
 import json
+from urllib.parse import urlencode
 
 class RequestExecuter:
 
@@ -15,8 +16,8 @@ class RequestExecuter:
     def execute(self):
         self.log_request()
         try:
-            data = self.data() if not self.isJsonRequest() else None
-            jsonData = json.loads(self.data()) if self.isJsonRequest() and self.data() != None else None
+            data = self.data() if not self.is_json_request() else None
+            jsonData = json.loads(self.data()) if self.is_json_request() and self.data() != None else None
             res = request(self.method(), self.url(), data=data, 
                         json=jsonData, headers=self.headers())
             self.response = {
@@ -25,7 +26,7 @@ class RequestExecuter:
             }
 
             self.response['json'] = False
-            if self.isJsonResponse():
+            if self.is_json_response():
                 try:
                     self.response['data'] = res.json()
                     self.response['json'] = True
@@ -42,18 +43,30 @@ class RequestExecuter:
         cprint(' REQUEST ', 'black', 'on_blue')
         print(colored(self.method().upper(), 'blue', attrs=['bold']), colored(self.url(), attrs=['bold']))
         print(colored('Request Headers ', 'magenta', attrs=['bold']),  '\n',  json.dumps(self.headers(), indent=2), sep="")
-        print(colored('Request Body ', 'magenta', attrs=['bold']), colored('[JSON]' if self.isJsonRequest() else '', 'light_grey', attrs=['bold']), '\n', json.dumps(json.loads(self.data()), indent=2) if self.isJsonRequest() and self.data() != None else self.data(), sep="")
+        print(colored('Request Body ', 'magenta', attrs=['bold']), colored('[JSON]' if self.is_json_request() else '', 'light_grey', attrs=['bold']), '\n', json.dumps(json.loads(self.data()), indent=2) if self.is_json_request() and self.data() != None else self.data(), sep="")
         print('\n')
     
     def log_response(self):
         cprint(' RESPONSE ', 'black', 'on_green')
         print(colored('Status', 'magenta', attrs=['bold']), self.response['status'])
         print(colored('Response Headers ', 'magenta', attrs=['bold']), '\n' , json.dumps(self.response['headers'], indent=2))
-        print(colored('Response Body ', 'magenta', attrs=['bold']), '\n', json.dumps(self.response['data'], indent=2) if self.isJsonResponse() and self.response['json'] else self.response['data'], sep="")
+        print(colored('Response Body ', 'magenta', attrs=['bold']), '\n', json.dumps(self.response['data'], indent=2) if self.is_json_response() and self.response['json'] else self.response['data'], sep="")
         print('\n')
 
     def url(self):
-        return self.request['url']
+        return self.add_path_vars(self.request['url']) + self.get_query_param()
+
+    def add_path_vars(self, url):
+        if 'pathParam' in self.request:
+            for x in self.request['pathParam']:
+                url = url.replace('{{' + x+ '}}', str(self.request['pathParam'][x]))
+        return url
+    
+    def get_query_param(self):
+        if 'queryParam' in self.request:
+            return '?' + urlencode(self.request['queryParam'])
+        return ''
+
 
     def method(self):
         return self.request['method']
@@ -61,12 +74,12 @@ class RequestExecuter:
     def data(self):
         return self.request['body'] if 'body' in self.request else None
 
-    def isJsonRequest(self):
+    def is_json_request(self):
         if 'requestType' in self.request:
             return self.request['requestType'] == 'json'
         return True
 
-    def isJsonResponse(self):
+    def is_json_response(self):
         if 'responseType' in self.request:
             return self.request['responseType'] == 'json'
         return True

@@ -13,7 +13,13 @@ postAction:
 
 request:
   method: get
-  url: "{{v::server}}/api/users/2"
+  url: "{{v::server}}/{{api}}/users/{{user}}"
+  pathParam:
+    user: 2
+    api: api
+  queryParam:
+    bla: "hello?/%heloasd"
+    do: "&asdpopasd"
 assign:
   fromBody:
     user_id: "$.data.id"
