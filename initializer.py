@@ -33,7 +33,7 @@ def update_config():
 
 
 def check_if_init():
-    if not '-init' in sys.argv[1:]:
+    if not '-i' in sys.argv[1:]:
         return
     for x in sys.argv[1:]:
         if('-e' in x):
