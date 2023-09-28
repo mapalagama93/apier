@@ -9,7 +9,7 @@ def eval(scriptSection, context):
         sys.path.append(os.path.abspath(vars.get('scripts_dir')))
     set = vars.set
     get = vars.get
-    
+
     if isinstance(scriptSection, str):
         exec(scriptSection)
     
