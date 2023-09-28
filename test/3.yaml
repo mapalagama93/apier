@@ -10,3 +10,4 @@ request:
   headers:
     testheader1 : "{{rnd_text}}"
     testheader2 : value2
+    

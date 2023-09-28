@@ -5,6 +5,7 @@ import yaml
 from termcolor import cprint
 import vars
 import script_evaluator
+import assigner
 
 
     
@@ -29,6 +30,9 @@ class Runner:
             template = self.getFileContent(x['file'])
             executer = RequestExecuter(template)
             executer.execute()
+
+            if 'assign' in template:
+                assigner.assign_vars(template['assign'], executer.response)
 
             if('postAction' in template):
                 context = EvalContext()
