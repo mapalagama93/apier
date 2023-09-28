@@ -17,7 +17,7 @@ class RequestExecuter:
         self.log_request()
         try:
             data = self.data() if not self.is_json_request() else None
-            jsonData = json.loads(self.data()) if self.is_json_request() and self.data() != None else None
+            jsonData = self.json() if self.is_json_request() else None
             res = request(self.method(), self.url(), data=data, 
                         json=jsonData, headers=self.headers())
             self.response = {
@@ -41,16 +41,21 @@ class RequestExecuter:
         
     def log_request(self):
         cprint(' REQUEST ', 'black', 'on_blue')
+        data = json.dumps(self.json(), indent=2) if self.json() != None else None
+        data = json.dumps(self.data(), indent=2) if data == None and not isinstance(self.data(), str) else self.data()
         print(colored(self.method().upper(), 'blue', attrs=['bold']), colored(self.url(), attrs=['bold']))
         print(colored('Request Headers ', 'magenta', attrs=['bold']),  '\n',  json.dumps(self.headers(), indent=2), sep="")
-        print(colored('Request Body ', 'magenta', attrs=['bold']), colored('[JSON]' if self.is_json_request() else '', 'light_grey', attrs=['bold']), '\n', json.dumps(json.loads(self.data()), indent=2) if self.is_json_request() and self.data() != None else self.data(), sep="")
+        print(colored('Request Body ', 'magenta', attrs=['bold']), 
+              colored('[JSON]' if self.is_json_request() and self.data() != None else '', 'light_grey', attrs=['bold']), '\n', 
+              data, sep="")
         print('\n')
     
     def log_response(self):
         cprint(' RESPONSE ', 'black', 'on_green')
         print(colored('Status', 'magenta', attrs=['bold']), self.response['status'])
         print(colored('Response Headers ', 'magenta', attrs=['bold']), '\n' , json.dumps(self.response['headers'], indent=2))
-        print(colored('Response Body ', 'magenta', attrs=['bold']), '\n', json.dumps(self.response['data'], indent=2) if self.is_json_response() and self.response['json'] else self.response['data'], sep="")
+        print(colored('Response Body ', 'magenta', attrs=['bold']), '\n', 
+              json.dumps(self.response['data'], indent=2) if self.is_json_response() and self.response['json'] else self.response['data'], sep="")
         print('\n')
 
     def url(self):
@@ -73,6 +78,14 @@ class RequestExecuter:
 
     def data(self):
         return self.request['body'] if 'body' in self.request else None
+    
+    def json(self):
+        if self.is_json_request() and self.data() != None:
+            if isinstance(self.data(), str):
+                return json.load(self.data())
+            return self.data()
+        return None 
+        
 
     def is_json_request(self):
         if 'requestType' in self.request:
