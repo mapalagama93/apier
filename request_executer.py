@@ -59,7 +59,7 @@ class RequestExecuter:
     def add_path_vars(self, url):
         if 'pathParam' in self.request:
             for x in self.request['pathParam']:
-                url = url.replace('{{' + x+ '}}', str(self.request['pathParam'][x]))
+                url = url.replace(':' + x, str(self.request['pathParam'][x]))
         return url
     
     def get_query_param(self):

@@ -1,0 +1,12 @@
+name: One
+preAction:
+  script: |
+    import functions as fn
+    set('rnd_text', fn.rand_txt())
+    
+request:
+  method: get
+  url: "{{server}}/api/movies/1"
+  headers:
+    testheader1 : "{{rnd_text}}"
+    testheader2 : value2

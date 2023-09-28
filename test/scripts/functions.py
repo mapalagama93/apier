@@ -1,4 +1,5 @@
 import vars
-def do():
-    print('from functions', vars.get('server'))
+import random
 
+def rand_txt():
+    return str(random.random())

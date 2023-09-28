@@ -28,4 +28,34 @@ assign:
     user_id: "$.data.id"
     user_email : "$.data.email"
   fromHeaders:
+    date: "date"name: Get user
+
+preAction: 
+  script: |
+    import functions
+    print("hello world", context.this['request']['url'])
+    functions.do()
+
+postAction: 
+  script:
+    file: scripts/post.py
+
+
+request:
+  requestType: json
+  responseType: json
+  method: get
+  url: "{{v::server}}/api/users/2"
+  headers:
+    asda : asdasd
+    qweaasd: asddasd
+  body: |
+    {
+      "asd" : "asdasd"
+    }
+assign:
+  fromBody:
+    user_id: "$.data.id"
+    user_email : "$.data.email"
+  fromHeaders:
     date: "date"

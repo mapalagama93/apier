@@ -6,24 +6,26 @@ from termcolor import cprint
 
 configs = Properties()
 vars = Properties()
+config_file_path = args.root + '/configs/config.properties'
+vars_file_path = args.root + '/configs/vars.properties'
 
-config_file_path = args.root + '/config.properties'
-Path(config_file_path).touch(exist_ok=True)
-config_file = open(config_file_path, 'rb')
-configs.load(config_file, 'utf-8')
+def load():
+    Path(config_file_path).touch(exist_ok=True)
+    config_file = open(config_file_path, 'rb')
+    configs.load(config_file, 'utf-8')
 
-for ev in args.env:
-    env_file_path = args.root + '/' + ev + '.properties'
-    if(os.path.exists(env_file_path) == False):
-        cprint(ev + '.properties file does not exists.', attrs=['reverse'])
-    else:
-        env_file = open(env_file_path, 'rb')
-        configs.load(env_file, 'utf-8')
+    for ev in args.env:
+        env_file_path = args.root + '/configs/' + ev + '.properties'
+        if(os.path.exists(env_file_path) == False):
+            cprint(ev + '.properties file does not exists.', attrs=['reverse'])
+        else:
+            env_file = open(env_file_path, 'rb')
+            configs.load(env_file, 'utf-8')
 
-vars_file_path = args.root + '/vars.properties'
-Path(vars_file_path).touch(exist_ok=True)
-var_file = open(vars_file_path, 'rb')
-vars.load(var_file, 'utf-8')
+    
+    Path(vars_file_path).touch(exist_ok=True)
+    var_file = open(vars_file_path, 'rb')
+    vars.load(var_file, 'utf-8')
 
 
 def get_config(key, val=None):
@@ -44,7 +46,7 @@ def set(key, val):
         vars.store(f, encoding='utf-8')
 
 def get(key, val=''):
-    return get_config(key, get_var(key, ''))
+    return get_var(key, get_config(key, ''))
 
 def get_all():
     all = Properties()
@@ -55,7 +57,7 @@ def get_all():
 
 def populate(str):
     for x in get_all():
-        str = str.replace('{{v::' + x + '}}', get_config(x, ''))
-        str = str.replace('{{var::' + x + '}}', get_config(x, ''))
-        str = str.replace('{{vars::' + x + '}}', get_config(x, ''))
+        str = str.replace('{{' + x + '}}', get(x, ''))
+        str = str.replace('{{v::' + x + '}}', get(x, ''))
+        str = str.replace('{{vars::' + x + '}}', get(x, ''))
     return str

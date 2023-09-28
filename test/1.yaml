@@ -1,0 +1,9 @@
+name: One
+request:
+  requestType: json
+  responseType: json
+  method: get
+  url: "{{server}}/api/movies/1"
+  headers:
+    testheader1 : value1
+    testheader2 : value2
