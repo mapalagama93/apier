@@ -1,6 +1,9 @@
+import args
 
-import initializer
-initializer.check_if_init()
+if args.is_init:
+    import initializer
+    initializer.init()
+    exit()
 
 import vars
 vars.load()

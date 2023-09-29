@@ -3,6 +3,7 @@ import sys
 from termcolor import cprint
 from pathlib import Path
 import base64
+import args
 
 files_to_create = ['config.properties', 'vars.properties']
 folders_to_create = ['configs', 'scripts']
@@ -32,24 +33,14 @@ def copy_sample():
 def update_config():
     with open(root + '/configs/config.properties', '+a') as f :
         f.write('scripts_dir=../scripts')
-    
 
 
-def check_if_init():
-    if '-h' in sys.argv[1:]:
-        cprint('To run : apier -e=dev get-user.yaml')
-        cprint('To generate : apier -i -e=dev,lzdev')
-        exit()
-    if not '-i' in sys.argv[1:]:
-        return
-    for x in sys.argv[1:]:
-        if('-e' in x):
-            for f in x.split('=')[1].split(','):
-                files_to_create.append(f + '.properties')
+def init():
+    for x in args.env:
+        files_to_create.append(x + '.properties')
     create_dir()
     touch_files()
     copy_sample()
     update_config()
-    exit()
 
 
