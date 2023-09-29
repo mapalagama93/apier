@@ -2,6 +2,7 @@ from requests import request
 from termcolor import cprint, colored
 import json
 from urllib.parse import urlencode
+import args
 
 class RequestExecuter:
 
@@ -14,10 +15,14 @@ class RequestExecuter:
         self.request = requestTemplate['request']
     
     def execute(self):
+        if args.is_curl:
+            self.print_curl()
+            return
+
         self.log_request()
         try:
             data = self.data() if not self.is_json_request() else None
-            jsonData = self.json() if self.is_json_request() else None
+            jsonData = self.json() if self.is_json_request() else None            
             res = request(self.method(), self.url(), data=data, 
                         json=jsonData, headers=self.headers())
             self.response = {
@@ -99,5 +104,17 @@ class RequestExecuter:
     
     def headers(self):
         return self.request['headers'] if 'headers' in self.request else {}
+    
+    def print_curl(self):
+        H = '-H ' if self.headers() != None else ''
+        H += '\n-H '.join(['"{0}: {1}" \\'.format(x, self.headers()[x]) for x in self.headers()])
+        data = json.dumps(self.json(), indent=2) if self.json() != None else None
+        data = json.dumps(self.data(), indent=2) if data == None and not isinstance(self.data(), str) else self.data()
+        D = ("-d '" + data + "'") if data != None else ''
+    
+        print('curl -X ', self.method().upper(), ' ', self.url(), ' \\\n', H, '\n', D, ' -kv', sep='' )
+
+
+
     
     
