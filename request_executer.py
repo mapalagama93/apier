@@ -87,7 +87,7 @@ class RequestExecuter:
     def json(self):
         if self.is_json_request() and self.data() != None:
             if isinstance(self.data(), str):
-                return json.load(self.data())
+                return json.loads(self.data())
             return self.data()
         return None 
         
