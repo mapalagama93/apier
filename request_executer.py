@@ -53,14 +53,13 @@ class RequestExecuter:
         print(colored('Request Body ', 'magenta', attrs=['bold']), 
               colored('[JSON]' if self.is_json_request() and self.data() != None else '', 'light_grey', attrs=['bold']), '\n', 
               data, sep="")
-        print('\n')
     
     def log_response(self):
         cprint(' RESPONSE ', 'black', 'on_green')
         print(colored('Status', 'magenta', attrs=['bold']), self.response['status'])
-        print(colored('Response Headers ', 'magenta', attrs=['bold']), '\n' , json.dumps(self.response['headers'], indent=2))
         print(colored('Response Body ', 'magenta', attrs=['bold']), '\n', 
               json.dumps(self.response['data'], indent=2) if self.is_json_response() and self.response['json'] else self.response['data'], sep="")
+        print(colored('Response Headers ', 'magenta', attrs=['bold']), '\n' , json.dumps(self.response['headers'], indent=2))
         print('\n')
 
     def url(self):
