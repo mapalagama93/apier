@@ -66,14 +66,14 @@ class RequestExecuter:
         return self.add_path_vars(self.request['url']) + self.get_query_param()
 
     def add_path_vars(self, url):
-        if 'pathParam' in self.request:
-            for x in self.request['pathParam']:
-                url = url.replace(':' + x, str(self.request['pathParam'][x]))
+        if 'pathParams' in self.request:
+            for x in self.request['pathParams']:
+                url = url.replace(':' + x, str(self.request['pathParams'][x]))
         return url
     
     def get_query_param(self):
-        if 'queryParam' in self.request:
-            return '?' + urlencode(self.request['queryParam'])
+        if 'queryParams' in self.request:
+            return '?' + urlencode(self.request['queryParams'])
         return ''
 
 
