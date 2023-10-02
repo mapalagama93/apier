@@ -5,9 +5,9 @@ if args.is_init:
     initializer.init()
     exit()
 
-import vars
 
-vars.load()
+from vars import vars
+vars.init()
 from runner import Runner
 run = Runner()
 run.run()

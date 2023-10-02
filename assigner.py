@@ -1,4 +1,4 @@
-import vars
+from vars import vars
 import jsonpath_ng
 from termcolor import cprint 
 

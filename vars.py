@@ -4,60 +4,74 @@ from pathlib import Path
 import os
 from termcolor import cprint
 
-configs = Properties()
-vars = Properties()
-config_file_path = args.root + '/configs/config.properties'
-vars_file_path = args.root + '/configs/vars.properties'
+class Vars:
+    __configs = Properties()
+    __vars = Properties()
+    __context = Properties()
 
-def load():
-    Path(config_file_path).touch(exist_ok=True)
-    config_file = open(config_file_path, 'rb')
-    configs.load(config_file, 'utf-8')
+    __config_file = args.root + '/configs/config.properties'
+    __var_file = args.root + '/configs/vars.properties'
+    __env_files = []
 
-    for ev in args.env:
-        env_file_path = args.root + '/configs/' + ev + '.properties'
-        if(os.path.exists(env_file_path) == False):
-            cprint(ev + '.properties file does not exists.', attrs=['reverse'])
-        else:
-            env_file = open(env_file_path, 'rb')
-            configs.load(env_file, 'utf-8')
+    def init(self):
+        self.__env_files = [args.root + '/configs/' + file + '.properties' for file in args.env]
+        self.__load_config()
+        self.__load_vars()
+        self.__load_envs()
 
+    def __load_config(self):
+        with open(self.__config_file, 'rb') as file:
+            self.__configs.load(file, 'utf-8')
+
+    def __load_vars(self):
+        with open(self.__var_file, 'rb') as file:
+            self.__vars.load(file, 'utf-8')
+
+    def __load_envs(self):
+        for fpath in self.__env_files:
+            if(os.path.exists(fpath) == False):
+                cprint(fpath + ' file does not exists.', 'yellow')
+            with open(fpath, 'rb') as file:
+                self.__configs.load(file, 'utf-8')
+
+    def __sync_vars(self):
+        with open(self.__var_file, 'wb') as file:
+            self.__vars.store(file, encoding='utf-8')
     
-    Path(vars_file_path).touch(exist_ok=True)
-    var_file = open(vars_file_path, 'rb')
-    vars.load(var_file, 'utf-8')
+    def get(self, key, default_alue = ''):
+        if key in self.__vars:
+            return self.__vars[key].data
+        
+        if key in self.__configs:
+            return self.__configs[key].data
 
+        if key in self.__context:
+            return self.__context[key].data
+        
+        return default_alue
 
-def get_config(key, val=None):
-    try:
-        return configs[key].data
-    except:
-        return val
+    def set(self, key, value):
+        self.__vars[key] = value
+        self.__sync_vars()
+    
+    def get_all(self):
+        all = Properties()
+        all.update(self.__configs)
+        all.update(self.__vars)
+        all.update(self.__context)
+        return all
+    
+    def replace_vars(self, text):
+        print(type(text))
+        for x in self.get_all():
+            text = text.replace('{{' + x + '}}', self.get(x, ''))
+            text = text.replace('{{v::' + x + '}}', self.get(x, ''))
+            text = text.replace('{{vars::' + x + '}}', self.get(x, ''))
+        return text
+    
+    def set_context(self, key, value):
+        self.__context[key, value]
 
-def get_var(key, val=None):
-    try:
-        return vars[key].data
-    except:
-        return val
+     
 
-def set(key, val):
-    vars[key] = val
-    with open(vars_file_path, 'wb') as f:
-        vars.store(f, encoding='utf-8')
-
-def get(key, val=''):
-    return get_var(key, get_config(key, ''))
-
-def get_all():
-    all = Properties()
-    all.update(configs)
-    all.update(vars)
-    return all
-
-
-def populate(str):
-    for x in get_all():
-        str = str.replace('{{' + x + '}}', get(x, ''))
-        str = str.replace('{{v::' + x + '}}', get(x, ''))
-        str = str.replace('{{vars::' + x + '}}', get(x, ''))
-    return str
+vars = Vars()

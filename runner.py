@@ -3,12 +3,11 @@ import os
 import args
 import yaml
 from termcolor import cprint
-import vars
+from vars import vars
 import script_evaluator
 import assigner
 
 
-    
 class Runner:
 
     def run(self):
@@ -60,7 +59,7 @@ class Runner:
     
     def getFileContent(self, fpath):
         with open(fpath, 'r') as file:
-            return yaml.safe_load(vars.populate(file.read()))
+            return yaml.safe_load(vars.replace_vars(file.read()))
     
     def executeSection(self, section, context):
         if 'script' in section:
