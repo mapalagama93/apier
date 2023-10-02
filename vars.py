@@ -62,7 +62,6 @@ class Vars:
         return all
     
     def replace_vars(self, text):
-        print(type(text))
         for x in self.get_all():
             text = text.replace('{{' + x + '}}', self.get(x, ''))
             text = text.replace('{{v::' + x + '}}', self.get(x, ''))

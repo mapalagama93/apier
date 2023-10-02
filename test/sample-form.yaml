@@ -1,0 +1,52 @@
+name: Sample request
+preAction: # this sections is to perform actions before the request.
+    # this is inline python script.
+    # you can create variables here
+    # get('key') can use to get values from vars and configs
+    # set('key', 'value') can use to set values to vars
+    # importing custom modules from script folder also supported
+    # all modules from script folder will be added to path.
+    # eg : import function
+    # will import function.py from script_dir that defined in config/config.properties 
+    # context variable can use to access current file's values. 
+    # eg : context.this['name'] will return this file's name 'Sample request'
+  script: |
+    import vars
+    # following line will set values to vars:
+    set('customHeader', 'Sample header value')
+    set('userId', '2')
+request:
+  url: "https://enj0ybtyq5l08.x.pipedream.net/form/:userId" # to use pathParams in the url use :key
+  method: post # support values, get | post | put | delete
+  pathParams:
+    userId: "{{userId}}" # to use vars and configs as values use {{var_name}}
+  queryParams:
+    sampleQueryParamKey: "This is query param value"
+  headers:
+    customHeader: "{{customHeader}}"
+  requestType: urlencoded # default value is json. available values: form | text | json | urlencoded
+  responseType: json # default value is json. available values:  text | json
+  body: 
+  # for request type form body content should be a key value object.
+  # key1 : value1
+  # key2 : value2
+  # for request type json body content can be json string or yaml object
+  # for request type string body should be a string
+    hello: world
+    name: no name
+assign: # assign can use to extract and store values to vars
+  body: # body will search values for given jsonPath and store in vars to given key
+    userEmail: "$.data.email"
+    userFirstName: "$.data.first_name"
+  headers: # headers use store response header values in vars
+    poweredBy: "X-Powered-By"
+
+postAction: # post action use to perform action after the request. 
+  # this is same as preAction script
+  # here context will have access to this file as well as response object
+  # context.response['headers'] will return response headers
+  # context.response['data'] will return response data
+  # context.response['json'] will set to True is the response body is a json object
+  # context.response['status'] will response status code
+  sctips: |
+    print('this is post action. response status is', context.response['status'])

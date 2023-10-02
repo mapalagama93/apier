@@ -16,8 +16,8 @@ preAction: # this sections is to perform actions before the request.
     set('customHeader', 'Sample header value')
     set('userId', '2')
 request:
-  url: "https://en57ezcqeka6h.x.pipedream.net/user/:userId" # to use pathParams in the url use :key
-  method: get # support values, get | post | put | delete
+  url: "https://enj0ybtyq5l08.x.pipedream.net/json/:userId" # to use pathParams in the url use :key
+  method: post # support values, get | post | put | delete
   pathParams:
     userId: "{{userId}}" # to use vars and configs as values use {{var_name}}
   queryParams:
@@ -37,6 +37,7 @@ request:
       "key1" : "value1",
       "key2" : "value2"
     }
+expectedStatus: 400
 assign: # assign can use to extract and store values to vars
   body: # body will search values for given jsonPath and store in vars to given key
     userEmail: "$.data.email"

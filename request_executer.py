@@ -14,35 +14,39 @@ class RequestExecuter:
         self.requestTemplate = requestTemplate
         self.request = requestTemplate['request']
     
-    def execute(self):
-        if args.is_curl:
-            self.print_curl()
-            return
-
+    def execute(self):        
         self.log_request()
         try:
             data = self.data() if not self.is_json_request() else None
-            jsonData = self.json() if self.is_json_request() else None            
-            res = request(self.method(), self.url(), data=data, 
-                        json=jsonData, headers=self.headers())
-            self.response = {
+            json = self.json() if self.is_json_request() else None            
+            self.response = self.send_request(self.method(), self.url(), data, json, self.headers())
+            self.validate_response()
+            self.log_response()
+        except:
+            cprint(' ERROR WHILE SENDING REQUEST ', 'red')
+            print('\n')
+    
+    def send_request(self, method, url, data, json, headers):
+        res = request(method, url, data=data, json=json, headers=headers)
+        response = {
                 'headers' : dict(res.headers),
                 'status' : res.status_code
             }
+        response['json'] = False
+        if self.is_json_response():
+            try:
+                response['data'] = res.json()
+                response['json'] = True
+            except:
+                response['data'] = res.text
+        else:
+            response['data'] = res.text
+        return response
 
-            self.response['json'] = False
-            if self.is_json_response():
-                try:
-                    self.response['data'] = res.json()
-                    self.response['json'] = True
-                except:
-                    self.response['data'] = res.text
-            else:
-                self.response['data'] = res.text
-            self.log_response()
-        except:
-            cprint(' ERROR WHILE SENDING REQUEST ', 'red', 'on_red')
-            print('\n')
+    def validate_response(self):
+        self.response['success'] = False
+        if 'expectedStatus' in self.request:
+            self.response['success'] = self.request['expectedStatus'] == self.response['status']
         
     def log_request(self):
         cprint(' REQUEST ', 'black', 'on_blue')
@@ -60,7 +64,6 @@ class RequestExecuter:
         print(colored('Response Body ', 'magenta', attrs=['bold']), '\n', 
               json.dumps(self.response['data'], indent=2) if self.is_json_response() and self.response['json'] else self.response['data'], sep="")
         print(colored('Response Headers ', 'magenta', attrs=['bold']), '\n' , json.dumps(self.response['headers'], indent=2))
-        print('\n')
 
     def url(self):
         return self.add_path_vars(self.request['url']) + self.get_query_param()
@@ -75,7 +78,6 @@ class RequestExecuter:
         if 'queryParams' in self.request:
             return '?' + urlencode(self.request['queryParams'])
         return ''
-
 
     def method(self):
         return self.request['method']
@@ -102,7 +104,12 @@ class RequestExecuter:
         return True
     
     def headers(self):
-        return self.request['headers'] if 'headers' in self.request else {}
+        headers = self.request['headers'] if 'headers' in self.request else {}
+        if self.is_json_request():
+            headers['Content-Type'] = 'application/json'
+        elif self.request['requestType'] == 'urlencoded':
+            headers['Content-Type'] = 'application/x-www-form-urlencoded'
+        return headers
     
     def print_curl(self):
         H = '-H ' if self.headers() != None else ''
@@ -110,7 +117,6 @@ class RequestExecuter:
         data = json.dumps(self.json(), indent=2) if self.json() != None else None
         data = json.dumps(self.data(), indent=2) if data == None and not isinstance(self.data(), str) else self.data()
         D = ("-d '" + data + "'") if data != None else ''
-    
         print('curl -X ', self.method().upper(), ' ', self.url(), ' \\\n', H, '\n', D, ' -kv', sep='' )
 
 

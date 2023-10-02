@@ -15,9 +15,7 @@ class Runner:
         if len(files) == 0:
             cprint('No action provided. eg: apier -e=dev action1 action2', 'white', 'on_yellow', attrs=['bold'])
         for x in files:
-
             cprint('   START ACTION [' + x['name'] + ']   ', 'black', 'on_yellow', attrs=['bold'])
-            print('\n')
 
 
             template = self.getFileContent(x['file'])
@@ -28,18 +26,23 @@ class Runner:
             
             template = self.getFileContent(x['file'])
             executer = RequestExecuter(template)
-            executer.execute()
+            if args.is_curl:
+                executer.print_curl()
+            else:
+                executer.execute()
+                if not executer.response['success']:
+                    cprint('Unexpected response code ' + str(executer.response['status']),'red')
+                    exit()
+                    
+                if 'assign' in template:
+                    assigner.assign_vars(template['assign'], executer.response)
 
-            if 'assign' in template:
-                assigner.assign_vars(template['assign'], executer.response)
-
-            if('postAction' in template):
-                context = EvalContext()
-                context.this = template
-                context.response = executer.response
-                self.executeSection(template['postAction'], context)
+                if('postAction' in template):
+                    context = EvalContext()
+                    context.this = template
+                    context.response = executer.response
+                    self.executeSection(template['postAction'], context)
             
-
             cprint('   END ACTION [' + x['name']+']   ', 'black', 'on_yellow', attrs=['bold'])
             print('\n')
         
