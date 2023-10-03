@@ -44,7 +44,7 @@ class RequestExecuter:
         return response
 
     def __validate_response(self):
-        self.response['success'] = False
+        self.response['success'] = True
         if 'expectedStatus' in self.request:
             self.response['success'] = self.request['expectedStatus'] == self.response['status']
         
