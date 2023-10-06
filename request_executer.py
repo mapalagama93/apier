@@ -50,8 +50,7 @@ class RequestExecuter:
         
     def __log_request(self):
         cprint(' REQUEST ', 'black', 'on_blue')
-        data = json.dumps(self.__json(), indent=2) if self.__json() != None else None
-        data = json.dumps(self.__data(), indent=2) if data == None and not isinstance(self.__data(), str) else self.__data()
+        data = self.__body_str()
         print(colored(self.__method().upper(), 'blue', attrs=['bold']), colored(self.__url(), attrs=['bold']))
         print(colored('Request Headers ', 'magenta', attrs=['bold']),  '\n',  json.dumps(self.__headers(), indent=2), sep="")
         print(colored('Request Body ', 'magenta', attrs=['bold']), 
@@ -89,14 +88,23 @@ class RequestExecuter:
         if self.__is_json_request() and self.__data() != None:
             if isinstance(self.__data(), str):
                 return json.loads(self.__data())
-            return self.__data()
+            return json.loads(json.dumps(self.__data()))
         return None 
-        
+
+    def __body_str(self):
+        b_json = self.__json()
+        if b_json != None:
+            return json.dumps(b_json, indent=2)
+        b_data = self.__data()
+        if b_data == None:
+            return None;
+        if isinstance(b_data, str):
+            return json.dumps(b_data, indent=2)
+        return b_data
+
 
     def __is_json_request(self):
-        if 'requestType' in self.request:
-            return self.request['requestType'] == 'json'
-        return True
+        return self.__request_type() == 'json'
 
     def __is_json_response(self):
         if 'responseType' in self.request:
@@ -105,19 +113,43 @@ class RequestExecuter:
     
     def __headers(self):
         headers = self.request['headers'] if 'headers' in self.request else {}
-        if self.__is_json_request():
-            headers['Content-Type'] = 'application/json'
-        elif self.request['requestType'] == 'urlencoded':
-            headers['Content-Type'] = 'application/x-www-form-urlencoded'
+        headers['Content-Type'] = self.__content_type()
         return headers
     
+    def __content_type(self):
+        type = self.__request_type()
+        if type == 'form':
+            return 'form-data/multipart'
+        elif type == 'urlencoded':
+            return 'application/x-www-form-urlencoded'
+        elif type == 'text':
+            return 'text/plain'
+        return 'application/json'
+    
+    def __request_type(self):
+        return self.request['requestType'] if 'requestType' in self.request else 'json';
+
     def print_curl(self):
         H = '-H ' if self.__headers() != None else ''
-        H += '\n-H '.join(['"{0}: {1}" \\'.format(x, self.__headers()[x]) for x in self.__headers()])
-        data = json.dumps(self.__json(), indent=2) if self.__json() != None else None
-        data = json.dumps(self.__data(), indent=2) if data == None and not isinstance(self.__data(), str) else self.__data()
+        H += '\n-H '.join(["'{0}: {1}' \\".format(x, self.__headers()[x]) for x in self.__headers()])
+        data = self.__curl_body()
         D = ("-d '" + data + "'") if data != None else ''
         print('curl -X ', self.__method().upper(), ' ', self.__url(), ' \\\n', H, '\n', D, ' -kv', sep='' )
+    
+    def __curl_body(self):
+        type = self.__request_type()
+        if type == 'form':
+            return 'CURL FORM DATA NOT SUPPORT YET'
+        elif type == 'urlencoded':
+            data = self.__data()
+            return data if isinstance(data, str) else urlencode(data)
+        elif type == 'text':
+            data = self.__data()
+            return data if isinstance(data, str) else str(data)
+        b_json = self.__json()
+        if b_json != None:
+            return json.dumps(b_json, indent=2)
+        return None
 
 
 

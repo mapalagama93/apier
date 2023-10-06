@@ -1,0 +1,30 @@
+name: Sample request
+preAction: 
+  script: |
+    import vars
+    # following line will set values to vars:
+    set('customHeader', 'Sample header value')
+    set('userId', '2')
+request:
+  url: "https://enj0ybtyq5l08.x.pipedream.net/json/:userId"
+  method: post 
+  pathParams:
+    userId: "{{userId}}" 
+  queryParams:
+    sampleQueryParamKey: "This is query param value"
+  headers:
+    customHeader: "{{customHeader}}"
+  requestType: urlencoded
+  body: 
+    body1: wqw
+    body2: wew
+assign: 
+  body: 
+    userEmail: "$.data.email"
+    userFirstName: "$.data.first_name"
+  headers: 
+    poweredBy: "X-Powered-By"
+
+postAction: 
+  sctips: |
+    print('this is post action. response status is', context.response['status'])
