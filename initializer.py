@@ -26,6 +26,9 @@ request:
     userId: "{{userId}}" # to use vars and configs as values use {{var_name}}
   queryParams:
     sampleQueryParamKey: "This is query param value"
+  basicAuth:  # This add Authorization header for basic auth
+    username: sampleUsername
+    password: samplePassword
   headers:
     customHeader: "{{customHeader}}"
   requestType: json # default value is json. available values: form | text | json

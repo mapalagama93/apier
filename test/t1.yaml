@@ -8,6 +8,9 @@ preAction:
 request:
   url: "https://enj0ybtyq5l08.x.pipedream.net/json/:userId"
   method: post 
+  basicAuth:
+    username: user
+    password: userpass
   pathParams:
     userId: "{{userId}}" 
   queryParams:

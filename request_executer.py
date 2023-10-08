@@ -3,6 +3,7 @@ from termcolor import cprint, colored
 import json
 from urllib.parse import urlencode
 import args
+import base64
 
 class RequestExecuter:
 
@@ -114,8 +115,16 @@ class RequestExecuter:
     def __headers(self):
         headers = self.request['headers'] if 'headers' in self.request else {}
         headers['Content-Type'] = self.__content_type()
+        if('basicAuth' in self.request):
+            headers['authorization'] = self.__basic_auth()
         return headers
-    
+
+    def __basic_auth(self):
+        if 'username' in self.request['basicAuth'] and 'password' in self.request['basicAuth']:
+            userpass = "{0}:{1}".format(self.request['basicAuth']['username'], self.request['basicAuth']['password'])
+            return 'Basic ' + base64.b64encode(userpass.encode()).decode()
+        return ''
+
     def __content_type(self):
         type = self.__request_type()
         if type == 'form':
@@ -149,9 +158,4 @@ class RequestExecuter:
         b_json = self.__json()
         if b_json != None:
             return json.dumps(b_json, indent=2)
-        return None
-
-
-
-    
-    
+        return None 
