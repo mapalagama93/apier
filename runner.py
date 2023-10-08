@@ -31,7 +31,8 @@ class Runner:
             else:
                 executer.execute()
                 if not executer.response['success']:
-                    cprint('Unexpected response code ' + str(executer.response['status']),'red')
+                    code = executer.response['status'] if 'status' in executer.response else 'UNKNOWN STATUS CODE'
+                    cprint('Unexpected response code ' + str(code),'red')
                     exit()
                     
                 if 'assign' in template:

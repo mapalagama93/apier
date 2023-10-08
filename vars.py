@@ -20,10 +20,16 @@ class Vars:
         self.__load_envs()
 
     def __load_config(self):
+        if os.path.exists(self.__config_file) == False:
+             cprint(self.__config_file + ' file does not exists.', 'yellow')
+             return
         with open(self.__config_file, 'rb') as file:
             self.__configs.load(file, 'utf-8')
 
     def __load_vars(self):
+        if os.path.exists(self.__var_file) == False:
+             cprint(self.__var_file + ' file does not exists.', 'yellow')
+             return
         with open(self.__var_file, 'rb') as file:
             self.__vars.load(file, 'utf-8')
 
@@ -31,6 +37,7 @@ class Vars:
         for fpath in self.__env_files:
             if(os.path.exists(fpath) == False):
                 cprint(fpath + ' file does not exists.', 'yellow')
+                continue
             with open(fpath, 'rb') as file:
                 self.__configs.load(file, 'utf-8')
 

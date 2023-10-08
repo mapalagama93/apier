@@ -9,7 +9,7 @@ class RequestExecuter:
 
     requestTemplate = None
     request = None
-    response = None
+    response = {}
 
     def __init__(self, requestTemplate):
         self.requestTemplate = requestTemplate
@@ -23,9 +23,11 @@ class RequestExecuter:
             self.response = self.__send_request(self.__method(), self.__url(), data, json, self.__headers())
             self.__validate_response()
             self.__log_response()
-        except:
-            cprint(' ERROR WHILE SENDING REQUEST ', 'red')
-            print('\n')
+        except Exception as e:
+            self.response['success'] = False
+            cprint('ERROR WHILE SENDING REQUEST', 'red')
+            cprint(e, 'red')
+            exit()
     
     def __send_request(self, method, url, data, json, headers):
         res = request(method, url, data=data, json=json, headers=headers)
