@@ -4,6 +4,8 @@ import json
 from urllib.parse import urlencode
 import args
 import base64
+import os
+from vars import vars
 
 class RequestExecuter:
 
@@ -85,7 +87,12 @@ class RequestExecuter:
         return self.request['method']
 
     def __data(self):
-        return self.request['body'] if 'body' in self.request else None
+        if 'body' in self.request:
+            return self.request['body']
+        if 'bodyContentFile' in self.request:
+            content = open(os.path.abspath(self.request['bodyContentFile']), 'r').read()
+            return vars.replace_vars(content)
+        return None
     
     def __json(self):
         if self.__is_json_request() and self.__data() != None:
@@ -116,7 +123,8 @@ class RequestExecuter:
     
     def __headers(self):
         headers = self.request['headers'] if 'headers' in self.request else {}
-        headers['Content-Type'] = self.__content_type()
+        if 'Content-Type' not in self.request:
+            headers['Content-Type'] = self.__content_type()
         if('basicAuth' in self.request):
             headers['authorization'] = self.__basic_auth()
         return headers
