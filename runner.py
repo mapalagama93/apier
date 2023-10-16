@@ -62,8 +62,17 @@ class Runner:
         return contents
     
     def getFileContent(self, fpath):
-        with open(fpath, 'r') as file:
-            return yaml.safe_load(vars.replace_vars(file.read()))
+        data = self.readFile(fpath)
+        fileContent = yaml.safe_load(vars.replace_vars(data))
+        if 'request' in fileContent and 'bodyContentFile' in fileContent['request']:
+            p = os.path.abspath(fileContent['request']['bodyContentFile'])
+            if os.path.exists(p):
+                bodyContent = self.readFile(p)
+                fileContent['request']['body'] = vars.replace_vars(bodyContent)
+        return fileContent
+    
+    def readFile(self, fpath):
+        return open(fpath, 'r').read()
     
     def executeSection(self, section, context):
         if 'script' in section:

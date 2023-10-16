@@ -89,9 +89,6 @@ class RequestExecuter:
     def __data(self):
         if 'body' in self.request:
             return self.request['body']
-        if 'bodyContentFile' in self.request:
-            content = open(os.path.abspath(self.request['bodyContentFile']), 'r').read()
-            return vars.replace_vars(content)
         return None
     
     def __json(self):

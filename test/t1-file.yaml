@@ -24,7 +24,7 @@ assign:
   body: 
     userEmail: "$.data.email"
     userFirstName: "$.data.first_name"
-  headers: 
+  headers:
     poweredBy: "X-Powered-By"
 
 postAction: 
